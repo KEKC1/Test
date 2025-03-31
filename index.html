@@ -1,88 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Рулетка</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            margin-top: 20px;
-        }
-        #roulette {
-            margin: 20px auto;
-            width: 200px;
-            height: 200px;
-            border: 10px solid #000;
-            border-radius: 50%;
-            position: relative;
-        }
-        .number {
-            position: absolute;
-            text-align: center;
-            font-size: 16px;
-            transform-origin: 50% 100%;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CaseBattle — Открытие Кейсов</title>
+  <!-- Подключение основных стилей -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
-    <h1>Рулетка</h1>
-    <p id="balance">Ваш баланс: 100</p>
-    <input type="number" id="bet" placeholder="Введите ставку">
-    <button onclick="spinRoulette()">Крутить</button>
-    <div id="roulette">
-        <!-- Здесь добавляем числа -->
+  <!-- Навигация -->
+  <header>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#lobby">Лобби</a></li>
+        <li><a href="#battle">Битва</a></li>
+        <li><a href="#inventory">Инвентарь</a></li>
+        <li><a href="#shop">Магазин</a></li>
+        <li><a href="#profile">Профиль</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Секция уведомлений (поп-апы) -->
+  <div id="notifications" class="notifications">
+    <!-- Здесь будут динамически появляться уведомления -->
+  </div>
+
+  <!-- Секция Лобби Кейсов -->
+  <section id="lobby" class="section lobby">
+    <h2>Лобби Кейсов</h2>
+    <div class="filters">
+      <input type="search" placeholder="Поиск по названию" id="search-case">
+      <select id="sort">
+        <option value="price">По цене</option>
+        <option value="risk">По риску</option>
+      </select>
     </div>
-    <p id="result">Результат появится здесь.</p>
+    <div class="case-grid">
+      <!-- Пример карточки кейса -->
+      <div class="case-card">
+        <div class="icon-container">
+          <!-- Здесь можно использовать анимированную 3D SVG-иконку -->
+          <img src="assets/icons/case-icon.svg" alt="Иконка кейса">
+        </div>
+        <h3>Название Кейса</h3>
+        <p>Минимальная ставка: 100 монет</p>
+        <div class="progress-bar">
+          <div class="progress" style="width: 40%;"></div>
+        </div>
+        <button class="join-btn">Присоединиться</button>
+      </div>
+      <!-- Повторить карточки для остальных кейсов... -->
+    </div>
+  </section>
 
-    <script>
-        let balance = 100;
+  <!-- Секция Экран Битвы -->
+  <section id="battle" class="section battle">
+    <h2>Битва</h2>
+    <div class="battle-container">
+      <!-- Split-экран для 2 игроков -->
+      <div class="player-panel left">
+        <h3>Игрок 1</h3>
+        <div class="slot-container">
+          <!-- Анимированные слоты для предметов -->
+          <div class="slot">Предмет 1</div>
+          <div class="slot">Предмет 2</div>
+        </div>
+      </div>
+      <div class="player-panel right">
+        <h3>Игрок 2</h3>
+        <div class="slot-container">
+          <div class="slot">Предмет 1</div>
+          <div class="slot">Предмет 2</div>
+        </div>
+      </div>
+      <!-- Таймер раунда -->
+      <div class="round-timer">
+        <span id="timer">30</span> сек
+      </div>
+      <!-- Ставки -->
+      <div class="bets">
+        <div class="current-bet">Текущая ставка: <span id="currentBet">0</span> монет</div>
+        <div class="bet-buttons">
+          <button onclick="addBet(100)">+100</button>
+          <button onclick="addBet(500)">+500</button>
+          <button onclick="allIn()">ALL-IN</button>
+        </div>
+        <div class="bank">
+          Общий банк: <span id="bankAmount">0</span>
+        </div>
+      </div>
+      <!-- История побед -->
+      <div class="battle-history">
+        <h4>История побед (последние 5 результатов):</h4>
+        <ul id="history">
+          <li>Победа: кейс A</li>
+          <li>Победа: кейс B</li>
+          <!-- и т.д. -->
+        </ul>
+      </div>
+    </div>
+  </section>
 
-        // Инициализация рулетки
-        const roulette = document.getElementById("roulette");
-        for (let i = 1; i <= 36; i++) {
-            const number = document.createElement("div");
-            number.innerText = i;
-            number.className = "number";
-            number.style.transform = `rotate(${i * 10}deg) translate(0, -180px)`;
-            roulette.appendChild(number);
+  <!-- Секция Инвентарь -->
+  <section id="inventory" class="section inventory">
+    <h2>Инвентарь</h2>
+    <div class="filters">
+      <select id="filter-rarity">
+        <option value="">Все редкости</option>
+        <option value="common">Common</option>
+        <option value="rare">Rare</option>
+        <option value="epic">Epic</option>
+        <option value="legendary">Legendary</option>
+      </select>
+      <select id="filter-type">
+        <option value="">Все типы</option>
+        <option value="weapon">Оружие</option>
+        <option value="gloves">Перчатки</option>
+        <option value="knife">Ножи</option>
+      </select>
+    </div>
+    <div class="inventory-grid">
+      <!-- Один из элементов инвентаря -->
+      <div class="inventory-item" title="Название: Пример кейса&#10;Редкость: Epic&#10;Статистика: Float 0.12&#10;Цена: 250 монет">
+        <img src="assets/icons/item-sample.svg" alt="Предмет">
+      </div>
+      <!-- Повторить для остальных предметов (5x8 сетка) -->
+    </div>
+  </section>
+
+  <!-- Секция Магазин Кейсов -->
+  <section id="shop" class="section shop">
+    <h2>Магазин Кейсов</h2>
+    <div class="carousel">
+      <!-- Карусель категорий с кейсами -->
+      <div class="carousel-item" data-category="обычные">
+        <img src="assets/icons/case-icon.svg" alt="Обычный кейс">
+        <p>Обычный</p>
+      </div>
+      <div class="carousel-item" data-category="премиум">
+        <img src="assets/icons/case-icon.svg" alt="Премиум кейс">
+        <p>Премиум</p>
+      </div>
+      <div class="carousel-item" data-category="ограниченные">
+        <img src="assets/icons/case-icon.svg" alt="Ограниченный кейс">
+        <p>Ограниченный</p>
+      </div>
+    </div>
+    <!-- Поп-ап с содержимым кейса -->
+    <div id="case-popup" class="popup hidden">
+      <div class="popup-content">
+        <h3>Содержимое кейса</h3>
+        <!-- График распределения редкостей (можно подключить chart.js или другой плагин) -->
+        <canvas id="rarityChart"></canvas>
+        <p>Шансы выпадения: ...</p>
+        <button id="openCaseBtn">Открыть за 10 монет</button>
+        <button class="close-popup" onclick="togglePopup()">Закрыть</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Секция Профиль Пользователя -->
+  <section id="profile" class="section profile">
+    <h2>Профиль</h2>
+    <div class="user-stats">
+      <div class="stat-item">
+        <p>Уровень</p>
+        <div class="progress-bar">
+          <div class="progress" style="width: 70%;"></div>
+        </div>
+      </div>
+      <div class="stat-item"><p>Открыто кейсов: <span id="casesOpened">15</span></p></div>
+      <div class="stat-item"><p>ROI: <span id="roi">120%</span></p></div>
+      <div class="stat-item"><p>Топовый предмет: <span id="topItem">Меч Судьбы</span></p></div>
+    </div>
+    <div class="transaction-history">
+      <h4>История транзакций</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Тип</th>
+            <th>Сумма</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-03-30</td>
+            <td>Открытие кейса</td>
+            <td>10 монет</td>
+          </tr>
+          <!-- Другие записи -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Дополнительные Фичи: достижения, ежедневные бонусы, рефералы и чат -->
+  <section id="extras" class="section extras">
+    <h2>Дополнительные Функции</h2>
+    <div class="achievements">
+      <h3>Достижения</h3>
+      <div class="badge">Бейдж 1</div>
+      <div class="badge">Бейдж 2</div>
+      <!-- ... -->
+    </div>
+    <div class="daily-bonus">
+      <h3>Ежедневные бонусы</h3>
+      <div class="calendar">
+        <!-- Здесь может быть интерактивный календарь -->
+        <p>Календарь бонусов</p>
+      </div>
+    </div>
+    <div class="referral">
+      <h3>Реферальная программа</h3>
+      <p>Ваш реферальный код: ABC123</p>
+    </div>
+    <div class="chat">
+      <h3>Чат в реальном времени</h3>
+      <div class="chat-window">
+        <!-- Сообщения чата будут отображаться здесь -->
+      </div>
+      <input type="text" placeholder="Ваше сообщение">
+      <button>Отправить</button>
+    </div>
+  </section>
+
+  <!-- Пример подключения скриптов -->
+  <script>
+    // Пример простейшей логики для таймера раунда
+    let timerElement = document.getElementById('timer');
+    let roundTime = 30;
+    function startTimer() {
+      const interval = setInterval(() => {
+        if (roundTime > 0) {
+          roundTime -= 1;
+          timerElement.textContent = roundTime;
+        } else {
+          clearInterval(interval);
+          // Здесь можно добавить логику окончания раунда
         }
+      }, 1000);
+    }
+    startTimer();
 
-        function spinRoulette() {
-            const bet = parseInt(document.getElementById("bet").value);
-            if (isNaN(bet) || bet <= 0) {
-                alert("Введите корректную ставку!");
-                return;
-            }
-            if (bet > balance) {
-                alert("Недостаточно средств для ставки!");
-                return;
-            }
+    // Пример добавления ставки
+    let currentBetEl = document.getElementById('currentBet');
+    let bankAmountEl = document.getElementById('bankAmount');
+    let currentBet = 0, bankAmount = 0;
+    function addBet(amount) {
+      currentBet += amount;
+      bankAmount += amount;
+      currentBetEl.textContent = currentBet;
+      bankAmountEl.textContent = bankAmount;
+    }
+    function allIn() {
+      // Реализуйте логику all-in, например, взять оставшиеся монеты пользователя
+      let remaining = 1000; // примерная сумма
+      currentBet += remaining;
+      bankAmount += remaining;
+      currentBetEl.textContent = currentBet;
+      bankAmountEl.textContent = bankAmount;
+    }
 
-            const spinAngle = Math.random() * 360; // Случайный угол
-            roulette.style.transition = "transform 3s ease-out";
-            roulette.style.transform = `rotate(${spinAngle + 3600}deg)`; // Анимация
-
-            setTimeout(() => {
-                const resultNumber = Math.floor((36 - ((spinAngle % 360) / 10)) % 36) + 1;
-                document.getElementById("result").innerText = `Выпало число: ${resultNumber}`;
-                
-                if (Math.random() > 0.5) { // Условно ставка выигрывает
-                    balance += bet;
-                    alert("Поздравляем! Вы выиграли!");
-                } else {
-                    balance -= bet;
-                    alert("Вы проиграли свою ставку.");
-                }
-                document.getElementById("balance").innerText = `Ваш баланс: ${balance}`;
-            }, 3000);
-        }
-    </script>
+    // Пример показа/скрытия поп-апа магазина кейсов
+    function togglePopup() {
+      document.getElementById('case-popup').classList.toggle('hidden');
+    }
+  </script>
 </body>
 </html>
