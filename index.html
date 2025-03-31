@@ -15,16 +15,73 @@
             font-size: 18px;
             margin-top: 20px;
         }
+        #roulette {
+            margin: 20px auto;
+            width: 200px;
+            height: 200px;
+            border: 10px solid #000;
+            border-radius: 50%;
+            position: relative;
+        }
+        .number {
+            position: absolute;
+            text-align: center;
+            font-size: 16px;
+            transform-origin: 50% 100%;
+        }
     </style>
 </head>
 <body>
     <h1>Рулетка</h1>
-    <p id="result">Нажмите кнопку для запуска рулетки</p>
+    <p id="balance">Ваш баланс: 100</p>
+    <input type="number" id="bet" placeholder="Введите ставку">
     <button onclick="spinRoulette()">Крутить</button>
+    <div id="roulette">
+        <!-- Здесь добавляем числа -->
+    </div>
+    <p id="result">Результат появится здесь.</p>
+
     <script>
+        let balance = 100;
+
+        // Инициализация рулетки
+        const roulette = document.getElementById("roulette");
+        for (let i = 1; i <= 36; i++) {
+            const number = document.createElement("div");
+            number.innerText = i;
+            number.className = "number";
+            number.style.transform = `rotate(${i * 10}deg) translate(0, -180px)`;
+            roulette.appendChild(number);
+        }
+
         function spinRoulette() {
-            const number = Math.floor(Math.random() * 36) + 1;
-            document.getElementById('result').innerText = `Выпало число: ${number}`;
+            const bet = parseInt(document.getElementById("bet").value);
+            if (isNaN(bet) || bet <= 0) {
+                alert("Введите корректную ставку!");
+                return;
+            }
+            if (bet > balance) {
+                alert("Недостаточно средств для ставки!");
+                return;
+            }
+
+            const spinAngle = Math.random() * 360; // Случайный угол
+            roulette.style.transition = "transform 3s ease-out";
+            roulette.style.transform = `rotate(${spinAngle + 3600}deg)`; // Анимация
+
+            setTimeout(() => {
+                const resultNumber = Math.floor((36 - ((spinAngle % 360) / 10)) % 36) + 1;
+                document.getElementById("result").innerText = `Выпало число: ${resultNumber}`;
+                
+                if (Math.random() > 0.5) { // Условно ставка выигрывает
+                    balance += bet;
+                    alert("Поздравляем! Вы выиграли!");
+                } else {
+                    balance -= bet;
+                    alert("Вы проиграли свою ставку.");
+                }
+                document.getElementById("balance").innerText = `Ваш баланс: ${balance}`;
+            }, 3000);
         }
     </script>
 </body>
